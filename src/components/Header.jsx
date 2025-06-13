@@ -1,13 +1,24 @@
 import { Mail, Linkedin, Github, FileDown } from "lucide-react";
+import profileImage from '../assets/fotoRiffat.jpg';
 
 function Header() {
   return (
     <header className="header">
       <div className="headerContent">
-        <h1 className="title">
-          Hi, I'm <span className="title-name">Riffat Nabil Shiddiq</span>
-        </h1>
-        <p className="subtitle">(Full Stack Developer)</p>
+        <div className="header-top">
+          <div className="header-info">
+            <h1 className="title">
+              Hi, I'm <span className="title-name">Riffat Nabil Shiddiq</span>
+            </h1>
+            <p className="subtitle">(Full Stack Developer)</p>
+          </div>          <div className="profile-image-container">
+            <img 
+              src={profileImage} 
+              alt="Riffat Nabil Shiddiq" 
+              className="profile-image" 
+            />
+          </div>
+        </div>
         <p className="about-me">
           I am an Informatics student at Telkom University with a strong passion 
           for Fullstack Development. My experience working on collaborative projects 
