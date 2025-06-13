@@ -45,13 +45,12 @@ function Header() {
             className="iconLink"
           >
             <Github size={24} />
-          </a>
-          <a
-            href="/resume.pdf"
+          </a>          <a
+            href="/CV_Riffat.pdf"
             target="_blank"
             rel="noopener noreferrer"
             className="cvButton"
-            download
+            download="CV_Riffat.pdf"
           >
             <FileDown size={20} />
             <span>Download CV</span>
