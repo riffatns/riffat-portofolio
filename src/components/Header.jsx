@@ -1,7 +1,20 @@
-import { Mail, Linkedin, Github, FileDown } from "lucide-react";
+import { Mail, Linkedin, Github, FileDown, X } from "lucide-react";
 import profileImage from '../assets/fotoRiffat.jpg';
+import { useState } from 'react';
 
 function Header() {
+  const [showModal, setShowModal] = useState(false);
+
+  const openModal = () => {
+    setShowModal(true);
+    document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    document.body.style.overflow = 'auto'; // Re-enable scrolling
+  };
+
   return (
     <header className="header">
       <div className="headerContent">
@@ -11,12 +24,15 @@ function Header() {
               Hi, I'm <span className="title-name">Riffat Nabil Shiddiq</span>
             </h1>
             <p className="subtitle">(Full Stack Developer)</p>
-          </div>          <div className="profile-image-container">
+          </div>          <div className="profile-image-container" onClick={openModal}>
             <img 
               src={profileImage} 
               alt="Riffat Nabil Shiddiq" 
               className="profile-image" 
             />
+            <div className="image-overlay">
+              <span>Click to view</span>
+            </div>
           </div>
         </div>
         <p className="about-me">
@@ -65,9 +81,24 @@ function Header() {
           >
             <FileDown size={20} />
             <span>Download CV</span>
-          </a>
-        </div>
+          </a>        </div>
       </div>
+
+      {/* Image Modal/Lightbox */}
+      {showModal && (
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={closeModal}>
+              <X size={24} />
+            </button>
+            <img 
+              src={profileImage} 
+              alt="Riffat Nabil Shiddiq - Full Size" 
+              className="modal-image" 
+            />
+          </div>
+        </div>
+      )}
     </header>
   );
 }
