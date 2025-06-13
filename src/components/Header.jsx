@@ -19,12 +19,11 @@ function Header() {
     <header className="header">
       <div className="headerContent">
         <div className="header-top">
-          <div className="header-info">
-            <h1 className="title">
+          <div className="header-info">            <h1 className="title">
               Hi, I'm <span className="title-name">Riffat Nabil Shiddiq</span>
             </h1>
-            <p className="subtitle">(Full Stack Developer)</p>
-          </div>          <div className="profile-image-container" onClick={openModal}>
+            <p className="subtitle typing-effect">(Full Stack Developer)</p>
+          </div>          <div className="profile-image-container floating-animation" onClick={openModal}>
             <img 
               src={profileImage} 
               alt="Riffat Nabil Shiddiq" 
