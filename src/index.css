@@ -295,6 +295,8 @@ html:focus-within {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 24px;
+  position: relative;
+  z-index: 1; /* Ensure all project cards are in same stacking context */
 }
 
 .card {
@@ -307,6 +309,8 @@ html:focus-within {
   background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  position: relative; /* Ensure position context for stacking */
+  z-index: 1; /* Lower z-index to ensure it stays behind the modal */
 }
 
 .card:hover {
@@ -611,6 +615,487 @@ html:focus-within {
   border-radius: 4px;
 }
 
+/* Project Modal Styles */
+.project-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: -50%; /* Offset to center the 200% width overlay */
+  width: 200%; /* Keeping the 200% width as requested */
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95); /* Darker background for better contrast */
+  backdrop-filter: blur(12px); /* Increased blur for better coverage */
+  z-index: 9999; /* Very high z-index to ensure it's above all content */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow: hidden; /* Prevent scrollbars from appearing */
+}
+
+.project-modal-content {
+  position: relative;
+  width: 98%;
+  max-width: 1400px; /* Much wider for landscape feel */
+  height: 90vh; /* Increased height for better overall display */
+  background: rgba(10, 15, 30, 0.98);
+  border-radius: 12px;
+  overflow: hidden;
+  animation: modalFadeIn 0.3s ease;
+  box-shadow: 0 20px 60px 0 rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  z-index: 10000; /* Ensure it's above the overlay */
+}
+
+.project-modal-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10001; /* Highest z-index to ensure it's clickable */
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+}
+
+.project-modal-close:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+  transform: scale(1.15);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Image Showcase - Main Focus */
+.project-modal-image-showcase {
+  flex: 1;
+  width: 100%;
+  height: 75%; /* Reduced height to balance with increased info panel height */
+  position: relative;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0; /* Removed padding to maximize image space */
+}
+
+.project-modal-image-large {
+  width: 100%; /* Full width of container */
+  height: 100%; /* Full height of container */
+  object-fit: contain; /* Maintain aspect ratio while fitting entire image */
+  object-position: center; /* Center the image */
+  display: block;
+  margin: 0;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
+  animation: zoomImage 0.4s ease forwards;
+  border-radius: 0; /* Removed border radius for edge-to-edge appearance */
+  transition: all 0.3s ease;
+  cursor: zoom-in;
+}
+
+.project-modal-image-large:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Loading Spinner for Modal Image */
+.loading-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  border-top-color: #ffffff;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* Info Panel - Compact Design */
+.project-modal-info-panel {
+  padding: 16px 20px;
+  background-color: rgba(10, 15, 30, 0.98);
+  color: white;
+  height: 25%; /* Increased height to ensure buttons are visible */
+  width: 100%;
+  overflow-y: hidden; /* Changed from auto to hidden since we're using the wrapper for scrolling */
+  gap: 8px; /* Reduced gap to fit more content */
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.project-modal-info-panel::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.project-modal-info-panel::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.project-modal-info-panel::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.project-modal-info-panel::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.project-modal-title {
+  font-size: 1.8rem;
+  margin: 0;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.project-modal-description {
+  margin-bottom: 6px;
+}
+
+.project-modal-description p {
+  line-height: 1.5;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Reduced from 3 to 2 lines */
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 400;
+}
+
+/* Compact Technologies Display */
+.project-modal-tech-compact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+  max-width: 100%;
+  padding-bottom: 6px;
+  overflow: visible;
+  justify-content: flex-start;
+}
+
+.project-tech-tag {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(147, 197, 253, 0.2) 100%);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 1);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  transition: all 0.2s ease;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  display: inline-flex;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  margin: 2px;
+}
+
+.project-tech-tag:hover {
+  background: rgba(59, 130, 246, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Compact Features Display */
+.project-modal-features-compact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 10px 0 2px 0;
+  align-items: center;
+}
+
+.feature-badge {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+  margin-right: 4px;
+  margin-bottom: 4px;
+}
+
+.feature-badge:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.feature-emoji {
+  font-size: 1rem;
+  margin-right: 8px;
+  opacity: 1;
+}
+
+.feature-text {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 1);
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.project-modal-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px; /* Less space now that we have a separator */
+  margin-bottom: 8px;
+  padding-top: 0;
+}
+
+/* Visual separator between features and buttons */
+.project-modal-separator {
+  position: relative;
+  margin: 16px 0 12px;
+  text-align: center;
+  height: 1px;
+  background: linear-gradient(
+    90deg, 
+    rgba(255, 255, 255, 0.05) 0%, 
+    rgba(255, 255, 255, 0.2) 50%, 
+    rgba(255, 255, 255, 0.05) 100%
+  );
+}
+
+.separator-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(10, 15, 30, 0.98);
+  padding: 0 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: rgba(59, 130, 246, 0.8); /* Blue color to match project theme */
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive styles for the separator */
+@media screen and (max-width: 767px) {
+  .project-modal-separator {
+    margin: 12px 0 8px;
+  }
+  
+  .separator-text {
+    font-size: 0.7rem;
+    padding: 0 8px;
+  }
+}
+
+.primary-button, .secondary-button {
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-align: center;
+  transition: all 0.25s ease;
+  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 110px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
+  letter-spacing: 0.2px;
+}
+
+.primary-button {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.95) 0%, rgba(37, 99, 235, 0.95) 100%);
+  color: white;
+  box-shadow: 0 3px 10px rgba(59, 130, 246, 0.35);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+.primary-button:hover {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 1) 0%, rgba(37, 99, 235, 1) 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(59, 130, 246, 0.45);
+}
+
+.secondary-button {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+}
+
+.secondary-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Add image overlay for card hover effect */
+.cardImageContainer {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+}
+
+.imageOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  color: white;
+  font-weight: 600;
+}
+
+.cardImageContainer:hover .imageOverlay {
+  opacity: 1;
+}
+
+/* Responsive Modal Layout */
+@media screen and (min-width: 768px) {
+  .project-modal-content {
+    flex-direction: row;
+    height: 75vh;
+  }
+
+  .project-modal-image-showcase {
+    width: 75%; /* Increased to 3/4 for more landscape orientation */
+    height: 100%;
+  }
+
+  .project-modal-info-panel {
+    width: 25%; /* Reduced to 1/4 for more landscape orientation */
+    height: 100%;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
+@media screen and (max-width: 767px) {
+  /* Adjustments for mobile devices */
+  .project-modal-content {
+    flex-direction: column;
+    height: auto;
+    max-height: 95vh;
+    width: 95%;
+  }
+
+  .project-modal-image-showcase {
+    width: 100%;
+    height: 45vh;
+    padding: 10px;
+  }
+
+  .project-modal-info-panel {
+    width: 100%;
+    height: auto;
+    max-height: 50vh;
+    border-left: none;
+    padding: 15px;
+  }
+    .project-modal-content-wrapper {
+    max-height: 50vh;
+    padding-bottom: 10px;
+  }
+  
+  .project-modal-buttons {
+    margin-top: 10px;
+  }
+
+  .project-modal-title {
+    font-size: 1.2rem;
+  }
+
+  .project-modal-description p {
+    font-size: 0.85rem;
+    max-height: 80px;
+  }
+  
+  .project-tech-tag {
+    font-size: 0.65rem;
+    padding: 3px 8px;
+  }
+  
+  .feature-badge {
+    padding: 4px 8px;
+  }
+  
+  .feature-text {
+    font-size: 0.75rem;
+  }
+  
+  .primary-button, .secondary-button {
+    font-size: 0.75rem;
+    padding: 6px 12px;
+    min-width: auto;
+  }
+}
+
+/* Ultra-wide screens for maximum landscape effect */
+@media screen and (min-width: 1600px) {
+  .project-modal-content {
+    max-width: 1800px;
+    height: 70vh;
+  }
+  
+  .project-modal-image-showcase {
+    width: 80%;
+  }
+  
+  .project-modal-info-panel {
+    width: 20%;
+  }
+  
+  .project-modal-image-large {
+    max-width: 100%;
+    max-height: 90%;
+  }
+}
+
+/* Animation for zooming images */
+@keyframes zoomImage {
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Modal appear animation */
 @keyframes modalFadeIn {
   0% {
     opacity: 0;
@@ -622,13 +1107,155 @@ html:focus-within {
   }
 }
 
-@keyframes zoomImage {
-  0% {
-    transform: scale(0.9);
-    opacity: 0;
+/* Fixed Modal Portal Styles */
+#root .project-modal-overlay,
+body > .project-modal-overlay {
+  /* This ensures modal rendered directly in body via portal is always on top */
+  position: fixed;
+  top: 0;
+  left: -50%;
+  width: 200%;
+  height: 100%;
+  z-index: 9999;
+  isolation: isolate; /* Creates new stacking context */
+}
+
+#root .project-modal-content,
+body > .project-modal-overlay .project-modal-content {
+  isolation: isolate; /* Creates new stacking context */
+  z-index: 10000;
+}
+
+/* Media queries for project modal image on different screens */
+@media (max-width: 768px) {
+  .project-modal-image-showcase {
+    height: 70%; /* Less height on mobile */
   }
-  100% {
-    transform: scale(1);
-    opacity: 1;
+  
+  .project-modal-info-panel {
+    height: 30%; /* More height for info on mobile */
   }
+  
+  .project-modal-content {
+    height: 80vh;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1200px) {
+  .project-modal-image-showcase {
+    height: 80%;
+  }
+  
+  .project-modal-info-panel {
+    height: 20%;
+  }
+}
+
+/* Optimize image display for various aspect ratios */
+@media (min-aspect-ratio: 16/9) {
+  .project-modal-image-large {
+    max-height: 98%; /* Optimize for wider screens */
+    width: auto;
+  }
+}
+
+@media (max-aspect-ratio: 4/3) {
+  .project-modal-image-large {
+    max-width: 98%; /* Optimize for taller screens */
+    height: auto;
+  }
+}
+
+/* Responsive styles for info panel */
+@media (max-width: 768px) {
+  .project-modal-info-panel {
+    padding: 12px 16px;
+  }
+  
+  .project-modal-title {
+    font-size: 1.3rem;
+  }
+  
+  .primary-button, .secondary-button {
+    padding: 5px 12px;
+    min-width: 100px;
+    font-size: 0.7rem;
+  }
+  
+  .project-modal-description p {
+    font-size: 0.8rem;
+  }
+}
+
+@media (min-width: 1400px) {
+  .project-modal-info-panel {
+    padding: 18px 24px;
+  }
+  
+  .project-modal-title {
+    font-size: 1.6rem;
+  }
+  
+  .project-modal-description p {
+    font-size: 1rem;
+  }
+  
+  .project-tech-tag {
+    font-size: 0.75rem;
+  }
+  
+  .feature-text {
+    font-size: 0.8rem;
+  }
+}
+
+.project-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  position: relative;
+  padding-bottom: 6px;
+}
+
+.project-modal-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.9) 0%, rgba(59, 130, 246, 0.3) 100%);
+  border-radius: 3px;
+}
+
+.project-modal-content-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.3) transparent;
+  display: flex;
+  flex-direction: column;
+}
+
+.project-modal-content-wrapper::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.project-modal-content-wrapper::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.project-modal-content-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+/* Updated styling for info panel */
+.project-modal-info-panel {
+  display: flex;
+  flex-direction: column;
 }
