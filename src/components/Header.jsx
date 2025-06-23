@@ -72,11 +72,11 @@ function Header() {
           >
             <Github size={24} />
           </a>          <a
-            href="/CV_Riffat.pdf"
+            href="/CV_RiffatNS.pdf"
             target="_blank"
             rel="noopener noreferrer"
             className="cvButton"
-            download="CV_Riffat.pdf"
+            download="CV_RiffatNS.pdf"
           >
             <FileDown size={20} />
             <span>Download CV</span>
